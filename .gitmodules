@@ -1,0 +1,9 @@
+[submodule "canard-sys/libcanard"]
+	path = canard-sys/libcanard
+	url = https://github.com/dronecan/libcanard
+[submodule "dronecan-dsdl-sys/DSDL"]
+	path = dronecan-dsdl-sys/DSDL
+	url = https://github.com/dronecan/DSDL
+[submodule "dronecan-dsdl-sys/dronecan_dsdlc"]
+	path = dronecan-dsdl-sys/dronecan_dsdlc
+	url = https://github.com/dronecan/dronecan_dsdlc

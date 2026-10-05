@@ -1,0 +1,30 @@
+[package]
+name = "dronecan-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+description = "Safe, allocation-free DroneCAN v0 transport and standard node messages"
+readme = "README.md"
+repository = "https://github.com/iamadahn/dronecan-rs"
+documentation = "https://docs.rs/dronecan-core"
+keywords = ["dronecan", "uavcan", "can-bus", "no-std", "embedded"]
+categories = ["embedded", "no-std", "network-programming"]
+publish = ["crates-io"]
+include = ["src/**", "tests/**", "build.rs", "README.md", "LICENSE-MIT", "LICENSE-APACHE", "THIRD-PARTY-NOTICES.md"]
+
+[features]
+default = ["vendored"]
+canfd = ["canard-sys/canfd"]
+deadline = ["canard-sys/deadline"]
+multi-iface = ["canard-sys/multi-iface"]
+tao-option = ["canard-sys/tao-option"]
+vendored = ["dronecan-dsdl-sys/vendored"]
+
+[dependencies]
+canard-sys = { version = "0.1.0", path = "../canard-sys" }
+dronecan-dsdl-sys = { version = "0.1.0", path = "../dronecan-dsdl-sys", default-features = false, features = ["uavcan"] }
+
+[package.metadata.docs.rs]
+default-target = "x86_64-unknown-linux-gnu"
+targets = ["x86_64-unknown-linux-gnu"]

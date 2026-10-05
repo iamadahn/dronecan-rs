@@ -1,0 +1,7 @@
+# DroneCAN-on-Rust library workspace: the reusable library crates live at the repo
+# root; runnable firmware lives under `bin/` (each app is its own workspace,
+# pinned to a specific MCU target).
+[workspace]
+resolver = "2"
+members = ["canard-sys", "dronecan-dsdl-sys", "dronecan-core"]
+exclude = ["bin"]

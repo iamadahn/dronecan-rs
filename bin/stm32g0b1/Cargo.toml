@@ -1,0 +1,77 @@
+[package]
+name = "embassy-dronecan"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+
+# Standalone workspace: this app builds for its own MCU target (see
+# .cargo/config.toml) and linker script (memory.x), independently of the library
+# workspace at the repository root.
+[workspace]
+
+[features]
+default = ["vendored"]
+
+# Native configuration forwarded through the safe core.
+canfd = ["dronecan-core/canfd"]
+multi-iface = ["dronecan-core/multi-iface"]
+deadline = ["dronecan-core/deadline"]
+tao-option = ["dronecan-core/tao-option"]
+vendored = ["dronecan-core/vendored"]
+
+# DSDL namespace selection — forwarded to dronecan-dsdl-sys.
+dsdl-uavcan = ["dronecan-dsdl-sys/uavcan"]
+dsdl-dronecan = ["dronecan-dsdl-sys/dronecan"]
+dsdl-ardupilot = ["dronecan-dsdl-sys/ardupilot"]
+dsdl-com = ["dronecan-dsdl-sys/com"]
+dsdl-cuav = ["dronecan-dsdl-sys/cuav"]
+dsdl-mppt = ["dronecan-dsdl-sys/mppt"]
+
+[dependencies]
+# The DroneCAN FFI crates from this repository's workspace.
+dronecan-core = { path = "../../dronecan-core", default-features = false }
+dronecan-dsdl-sys = { path = "../../dronecan-dsdl-sys", default-features = false }
+
+# Embassy STM32 with STM32G0B1 support
+embassy-stm32 = { version = "0.6", features = [
+    "stm32g0b1cb",
+    "time-driver-any",
+    "exti",
+    "unstable-pac",
+] }
+
+# Embassy runtime and utilities
+embassy-executor = { version = "0.10", features = ["platform-cortex-m", "executor-thread"] }
+embassy-time = { version = "0.5", features = ["tick-hz-32_768"] }
+embassy-sync = "0.8"
+embassy-futures = "0.1"
+
+# Critical section for shared resource access
+critical-section = "1.2"
+cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
+cortex-m-rt = "0.7"
+
+# Panic handler
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+
+# Logging
+defmt = "0.3"
+defmt-rtt = "0.4"
+embedded-can = "0.4"
+
+
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true
+incremental = false
+opt-level = 3
+overflow-checks = true
+
+[profile.release]
+codegen-units = 1
+debug = true
+lto = true
+incremental = false
+opt-level = "s"

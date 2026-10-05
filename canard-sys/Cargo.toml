@@ -1,0 +1,61 @@
+[package]
+name = "canard-sys"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"                       # edition 2024
+license = "MIT OR Apache-2.0"
+description = "Low-level FFI bindings to the DroneCAN libcanard core (canard.c/canard.h)"
+readme = "README.md"
+keywords = ["dronecan", "uavcan", "canard", "can-bus", "no-std"]
+categories = ["embedded", "external-ffi-bindings", "no-std"]
+repository = "https://github.com/iamadahn/dronecan-rs"
+documentation = "https://docs.rs/canard-sys"
+publish = ["crates-io"]
+# Only this crate is allowed to link the native `canard` library. The build
+# script must emit the corresponding `cargo:rustc-link-lib` metadata (cc does).
+links = "canard"
+build = "build.rs"
+# Package only the sources actually needed to build (the libcanard submodule
+# ships hundreds of unrelated files: drivers, tests, C++ wrappers, examples).
+# Affects `cargo package`/publish only, not local builds.
+include = [
+    "src/**/*",
+    "build.rs",
+    "wrapper.h",
+    "README.md",
+    "LICENSE-MIT",
+    "LICENSE-APACHE",
+    "THIRD-PARTY-NOTICES.md",
+    "libcanard/canard.c",
+    "libcanard/canard.h",
+    "libcanard/canard_internals.h",
+    "libcanard/LICENSE",
+]
+
+# libcanard compile-time configuration macros, exposed as cargo features so a
+# consuming crate can select them from its own Cargo.toml without touching the
+# bindings source. Each enabled feature adds a `-D` define that is applied
+# IDENTICALLY to the C compilation and to the bindgen pass (several of them
+# change struct layout / memory-block size, so the two must never diverge — the
+# build script guarantees that, and generates compile-time layout checks).
+#
+# Defaults are the upstream libcanard defaults: classic CAN 2.0B, single
+# interface, no deadline field.
+[features]
+default = []
+canfd = []        # -D CANARD_ENABLE_CANFD=1   — CAN FD (64-byte frames), also enables TAO by default
+multi-iface = []  # -D CANARD_MULTI_IFACE=1    — per-frame interface id/mask
+deadline = []     # -D CANARD_ENABLE_DEADLINE=1 — tx deadline timestamp field
+tao-option = []   # -D CANARD_ENABLE_TAO_OPTION=1 — tail-array optimization (else derived from `canfd`)
+asserts = []      # -D CANARD_ENABLE_ASSERTS   — enable assert() calls (needs a libc assert handler)
+allocate-sem = [] # -D CANARD_ALLOCATE_SEM=1   — semaphore-based allocation locking
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.71"
+cc = "1.2"
+
+[package.metadata.docs.rs]
+default-target = "x86_64-unknown-linux-gnu"
+targets = ["x86_64-unknown-linux-gnu"]

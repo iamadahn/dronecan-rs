@@ -1,0 +1,49 @@
+[package]
+name = "dronecan-dsdl-sys"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"                       # edition 2024
+# The archive also distributes the upstream GPL generator and templates.
+license = "(MIT OR Apache-2.0) AND GPL-3.0-or-later"
+description = "Generated FFI bindings for DroneCAN DSDL message (de)serialization, built on canard-sys"
+readme = "README.md"
+keywords = ["dronecan", "uavcan", "dsdl", "can-bus", "no-std"]
+categories = ["embedded", "external-ffi-bindings", "no-std"]
+repository = "https://github.com/iamadahn/dronecan-rs"
+documentation = "https://docs.rs/dronecan-dsdl-sys"
+publish = ["crates-io"]
+# Owns linking of the generated message (de)serialization C library.
+links = "dronecan_dsdl"
+build = "build.rs"
+include = [
+    "src/**", "build.rs", "wrapper.h", "README.md",
+    "LICENSE-MIT", "LICENSE-APACHE", "THIRD-PARTY-NOTICES.md", "requirements.txt",
+    "vendored/**", "DSDL/LICENSE", "DSDL/**/*.uavcan",
+    "dronecan_dsdlc/*.py", "dronecan_dsdlc/templates/**", "dronecan_dsdlc/COPYING",
+]
+
+# Which DSDL namespaces ("dictionaries") to generate. Feature dependencies
+# encode the parse-time namespace dependencies: every namespace needs `uavcan`,
+# and `dronecan`/`cuav`/`mppt` build on it. Default: dronecan (which pulls in
+# uavcan, its dependency). Select others from the consuming crate's Cargo.toml.
+[features]
+default = ["dronecan", "vendored"]
+vendored = []               # use checked-in generated C; no Python needed
+uavcan = []                 # base UAVCAN v0 namespace
+dronecan = ["uavcan"]       # DroneCAN namespace (extends uavcan)
+ardupilot = ["uavcan"]      # ArduPilot vendor namespace
+com = ["uavcan"]            # vendor namespace
+cuav = ["dronecan"]         # CUAV vendor namespace
+mppt = ["dronecan"]         # MPPT vendor namespace
+
+[dependencies]
+canard-sys = { version = "0.1.0", path = "../canard-sys" }
+
+[build-dependencies]
+bindgen = "0.71"
+cc = "1.2"
+
+[package.metadata.docs.rs]
+default-target = "x86_64-unknown-linux-gnu"
+targets = ["x86_64-unknown-linux-gnu"]
+features = ["ardupilot", "com", "cuav", "mppt"]
